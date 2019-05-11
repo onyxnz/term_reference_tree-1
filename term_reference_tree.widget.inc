@@ -199,7 +199,7 @@ function theme_term_tree_list($variables) {
  * display.
  */
 function _term_reference_tree_output_list_level(&$element, &$tree) {
-  if (isset($tree['children']) && is_array($tree['children']) && count($tree['children'] > 0)) {
+  if (isset($tree['children']) && is_array($tree['children']) && count($tree['children']) > 0) {
     $output = '<ul class="term">';
     $settings = $element['#display']['settings'];
     $tokens_selected = $settings['token_display_selected'];
@@ -680,7 +680,9 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
     '#depth' => $depth,
   );
 
-  if (!$element['#leaves_only'] || count($term->children) == 0) {
+  $count_of_children = (isset($term->children) && is_array($term->children)) ? count($term->children) : 0;
+
+  if (!$element['#leaves_only'] || $count_of_children == 0) {
     $name = "edit-" . str_replace('_', '-', $element['#field_name']);
     $e = array(
       '#type' => ($max_choices == 1) ? 'radio' : 'checkbox',
@@ -722,7 +724,7 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
 
   $container[$term->tid] = $e;
 
-  if (($depth + 1 <= $element['#max_depth'] || !$element['#max_depth']) && property_exists($term, 'children') && count($term->children) > 0) {
+  if (($depth + 1 <= $element['#max_depth'] || !$element['#max_depth']) && property_exists($term, 'children') && $count_of_children > 0) {
     $parents = $parent_tids;
     $parents[] = $term->tid;
     $container[$term->tid . '-children'] = _term_reference_tree_build_level($element, $term, $form_state, $value, $max_choices, $parents, $depth + 1);
