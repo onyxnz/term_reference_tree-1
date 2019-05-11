@@ -705,6 +705,12 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
       $e['#id'] = drupal_html_id('edit-' . implode('-', $parents_for_id));
       $e['#parents'] = $element['#parents'];
     }
+    $context = array(
+      'element' => $element,
+      'term' => $term,
+      'form_state' => $form_state,
+    );
+    drupal_alter('term_reference_tree_element', $e, $context) ;
   }
   else {
     $e = array(
