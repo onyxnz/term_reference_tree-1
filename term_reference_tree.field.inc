@@ -6,7 +6,7 @@
 function term_reference_tree_field_formatter_info() {
   return array(
     'term_reference_tree' => array(
-      'label' => 'Term reference tree',
+      'label' => t('Term reference tree'),
       'field types' => array('taxonomy_term_reference'),
       'settings' => array(
         'token_display_selected' => '',
@@ -51,14 +51,14 @@ function term_reference_tree_field_formatter_settings_form($field, $instance, $v
   if ($display['type'] == 'term_reference_tree' && module_exists('token')) {
     $element['token_display_selected'] = array(
       '#type' => 'textarea',
-      '#title' => 'Custom Term Label',
+      '#title' => t('Custom Term Label'),
       '#description' => t("Use tokens to change the term label.  Leave this field blank to use the term name linked to its taxonomy page."),
       '#default_value' => $settings['token_display_selected'],
     );
 
     $element['token_display_unselected'] = array(
       '#type' => 'textarea',
-      '#title' => 'Custom Term Label (unselected)',
+      '#title' => t('Custom Term Label (unselected)'),
       '#description' => t("Use tokens to change the term label for unselected parent terms.  Leave this field blank to use the same tokens as above."),
       '#default_value' => $settings['token_display_unselected'],
     );

@@ -84,7 +84,7 @@ function term_reference_tree_field_widget_settings_form($field, $instance) {
 
       $form['filter_view'] = array(
         '#type' => 'select',
-        '#title' => 'Filter by view',
+        '#title' => t('Filter by view'),
         '#description' => t("Filter the available options based on whether they appear in the selected view."),
         '#default_value' => $settings['filter_view'],
         '#options' => $options,
@@ -100,7 +100,7 @@ function term_reference_tree_field_widget_settings_form($field, $instance) {
     if (module_exists('token')) {
       $form['token_display'] = array(
         '#type' => 'textarea',
-        '#title' => 'Custom Term Label',
+        '#title' => t('Custom Term Label'),
         '#description' => t("Use tokens to change the term labels for the checkboxes and/or radio buttons. Leave this field blank to use the term name."),
         '#default_value' => $settings['token_display'],
       );
@@ -461,8 +461,8 @@ function theme_checkbox_tree_track_list($variables) {
 
   $label = format_plural(
       $variables['element']['#max_choices'],
-      'Selected item (click the item to uncheck it)',
-      'Selected items (click an item to uncheck it)'
+      t('Selected item (click the item to uncheck it)'),
+      t('Selected items (click an item to uncheck it)')
   );
   $output = '<div class="term-reference-track-list-container">';
   $output .= '<div class="term-reference-track-list-label">' . $label . '</div>';
@@ -615,11 +615,11 @@ function _term_reference_tree_get_allowed_values($filter) {
         }
       }
       else {
-        drupal_set_message("Cannot access view for term reference tree widget.", 'warning');
+        drupal_set_message(t("Cannot access view for term reference tree widget."), 'warning');
       }
     }
     else {
-      drupal_set_message("Term reference tree: no view named '$viewname'", 'warning');
+      drupal_set_message(t('Term reference tree: no view named !view_name', array('!view_name' => $viewname)), 'warning');
     }
   }
 
