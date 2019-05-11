@@ -3,23 +3,33 @@
 .field-widget-term-reference-tree ul
 {
   list-style-type: none;
+  list-style-image: none;
   margin-top: 0;
   margin-bottom: 0;
   margin-left: 0;
 }
 
+.item-list .field-widget-term-reference-tree li,
+.block .field-widget-term-reference-tree li,
+.field-widget-term-reference-tree li
+{
+  margin-left: 0;
+  margin-bottom: 3px;
+  line-height: 1.2em;
+}
 .item-list .field-widget-term-reference-tree ul ul,
 .block .field-widget-term-reference-tree ul ul,
 .field-widget-term-reference-tree ul ul
 {
-  margin-left: 1.5em;
+  margin-left: 20px;
+  padding-left: 0;
 }
 
 .item-list .field-widget-term-reference-tree ul .form-item,
 .block .field-widget-term-reference-tree ul .form-item,
 .field-widget-term-reference-tree ul .form-item {
-  margin: 0;
   padding: 0;
+  margin: 0px 0 0 20px;
 }
 
 .term-reference-tree-button,
@@ -31,6 +41,7 @@
   zoom: 1;
   vertical-align: middle;
   margin-right: 4px;
+  float: left;
 }
 
 .term-reference-tree-button {
@@ -38,7 +49,7 @@
 }
 
 .no-term-reference-tree-button {
-  background-color: #ddd;
+  background-color: transparent;
 }
 
 .term-reference-tree-button.term-reference-tree-collapsed {
@@ -51,6 +62,17 @@
   zoom: 1;
 }
 
+.field-widget-term-reference-tree input.form-checkbox,
+.field-widget-term-reference-tree input.form-radio {
+  float: left;
+  margin-top: 2px;
+  margin-left: -20px;
+}
+.field-widget-term-reference-tree .form-type-checkbox label,
+.field-widget-term-reference-tree .form-type-radio label{
+  margin-left: 0;
+  font-size: 0.875em;
+}
 .field-widget-term-reference-tree .disabled {
   opacity: .5;
 }
@@ -72,6 +94,7 @@
 .term-reference-tree-level
 {
   padding: 0;
+  margin-top: 3px;
 }
 
 /*
