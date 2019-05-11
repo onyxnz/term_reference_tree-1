@@ -615,7 +615,7 @@ function _term_reference_tree_get_allowed_values($filter) {
         }
       }
       else {
-        drupal_set_message(t("Cannot access view for term reference tree widget."), 'warning');
+        drupal_set_message(t('Cannot access view for term reference tree widget.'), 'warning');
       }
     }
     else {
