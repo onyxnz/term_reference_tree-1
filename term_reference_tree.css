@@ -1,7 +1,6 @@
-.item-list .field-widget-term-reference-tree ul,
-.block .field-widget-term-reference-tree ul,
-.field-widget-term-reference-tree ul
-{
+.item-list .term-reference-tree ul,
+.block .term-reference-tree ul,
+.term-reference-tree ul {
   list-style-type: none;
   list-style-image: none;
   margin-top: 0;
@@ -9,27 +8,26 @@
   margin-left: 0;
 }
 
-.item-list .field-widget-term-reference-tree li,
-.block .field-widget-term-reference-tree li,
-.field-widget-term-reference-tree li
-{
+.item-list .term-reference-tree li,
+.block .term-reference-tree li,
+.term-reference-tree li {
   margin-left: 0;
   margin-bottom: 3px;
   line-height: 1.2em;
 }
-.item-list .field-widget-term-reference-tree ul ul,
-.block .field-widget-term-reference-tree ul ul,
-.field-widget-term-reference-tree ul ul
-{
+
+.item-list .term-reference-tree ul ul,
+.block .term-reference-tree ul ul,
+.term-reference-tree ul ul {
   margin-left: 20px;
   padding-left: 0;
 }
 
-.item-list .field-widget-term-reference-tree ul .form-item,
-.block .field-widget-term-reference-tree ul .form-item,
-.field-widget-term-reference-tree ul .form-item {
+.item-list .term-reference-tree ul .form-item,
+.block .term-reference-tree ul .form-item,
+.term-reference-tree ul .form-item {
   padding: 0;
-  margin: 0px 0 0 20px;
+  margin: 0 0 0 20px;
 }
 
 .term-reference-tree-button,
@@ -69,7 +67,7 @@
   margin-left: -20px;
 }
 .field-widget-term-reference-tree .form-type-checkbox label,
-.field-widget-term-reference-tree .form-type-radio label{
+.field-widget-term-reference-tree .form-type-radio label {
   margin-left: 0;
   font-size: 0.875em;
 }
@@ -91,8 +89,7 @@
 }
 
 .region-content ul.term-reference-tree-level,
-.term-reference-tree-level
-{
+.term-reference-tree-level {
   padding: 0;
   margin-top: 3px;
 }
@@ -114,7 +111,7 @@
   color: red;
   background-image: url("images/bullet_delete.png");
   background-repeat: no-repeat;
-  background-position: middle left;
+  background-position: center left;
 }
 
 .term-reference-tree-track-list li.term_ref_tree_nothing_message {
