@@ -260,7 +260,7 @@ function checkMaxChoices(item, checkbox) {
 
   if(maxChoices > 0 && count >= maxChoices) {
     item.find('input[type=checkbox]:not(:checked)').attr('disabled', 'disabled').parent().addClass('disabled');
-  } else {
+  } else if (maxChoices > 0) {
     item.find('input[type=checkbox]').removeAttr('disabled').parent().removeClass('disabled');
   }
 
