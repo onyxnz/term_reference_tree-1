@@ -72,7 +72,7 @@ Drupal.behaviors.termReferenceTree = {
             event_target.remove();
 
             var checkbox = $('#' + control_id);
-            checkbox.removeAttr('checked');
+            checkbox.removeAttr('checked').trigger('change');
             checkMaxChoices(tree, checkbox);
 
             //Show "nothing selected" message, if needed.
