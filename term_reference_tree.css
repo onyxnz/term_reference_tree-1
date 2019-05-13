@@ -35,7 +35,7 @@
   width: 16px;
   height: 16px;
   display: inline-block;
-  *display: inline;
+  display: inline\9;
   zoom: 1;
   vertical-align: middle;
   margin-right: 4px;
@@ -56,7 +56,7 @@
 
 .field-widget-term-reference-tree .form-item {
   display: inline-block;
-  *display: inline;
+  display: inline\9;
   zoom: 1;
 }
 
@@ -71,13 +71,18 @@
   margin-left: 0;
   font-size: 0.875em;
 }
+
+.field-widget-term-reference-tree > .form-item {
+  display: block;
+}
+
 .field-widget-term-reference-tree .disabled {
   opacity: .5;
 }
 
 .field-widget-term-reference-tree .parent-term {
   display: inline-block;
-  *display: inline;
+  display: inline\9;
   zoom: 1;
   font-weight: bold;
 }
