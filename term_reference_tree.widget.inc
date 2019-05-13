@@ -666,10 +666,10 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
   $t = NULL;
   if (module_exists('locale') && !empty($term->tid)) {
     $t = taxonomy_term_load($term->tid);
-    $term_name = entity_label('taxonomy_term', $t);
+    $term_name = check_plain(entity_label('taxonomy_term', $t));
   }
   else {
-    $term_name = $term->name;
+    $term_name = check_plain($term->name);
   }
   $container = array(
     '#type' => 'checkbox_tree_item',
