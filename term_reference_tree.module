@@ -217,7 +217,7 @@ function _term_reference_tree_get_options(&$terms, &$allowed, $filter) {
 
   if (is_array($terms) && count($terms) > 0) {
     foreach ($terms as $term) {
-      if (!$filter || (is_array($allowed) && $allowed[$term->tid])) {
+      if (!$filter || (is_array($allowed) && isset($allowed[$term->tid]))) {
         // do not use entity_label() for non-term elements
         if (empty($term->tid)) {
           $options[''] = $term->name;
