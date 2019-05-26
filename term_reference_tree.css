@@ -71,6 +71,9 @@ html[dir=rtl] .no-term-reference-tree-button {
 .term-reference-tree-button {
   background-image: url('images/bullet_toggle_minus.png');
 }
+.term-reference-tree-button:hover {
+  cursor: pointer;
+}
 .no-term-reference-tree-button {
   background-color: transparent;
 }
@@ -79,6 +82,7 @@ html[dir=rtl] .no-term-reference-tree-button {
 }
 .field-widget-term-reference-tree .form-item {
   display: inline-block;
+  vertical-align: middle;
   display: inline\9;
   zoom: 1;
 }
@@ -126,6 +130,12 @@ html[dir=rtl] .field-widget-term-reference-tree .form-type-radio label {
   padding: 0;
   margin-top: 3px;
 }
+.term-reference-tree-level .loading .term-reference-tree-button,
+.term-reference-tree-level .loading .form-item {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 /*
  * Styles for track list of selected options.
  */
@@ -178,4 +188,14 @@ html[dir=rtl] .term-reference-tree-track-list li.track-item:hover {
 }
 .field-type-taxonomy-term-reference ul.links .term-tree-list ul.term li {
   float: none;
+}
+div.term-reference-tree-widget-level-ajax {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+div.term-reference-tree-widget-level-ajax .term-reference-tree-widget-level-ajax-button,
+div.term-reference-tree-widget-level-ajax .ajax-progress-throbber .message {
+  display: none;
 }
