@@ -705,8 +705,6 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
     '#has_children' => FALSE,
   );
 
-  $count_of_children = (isset($term->children) && is_array($term->children)) ? count($term->children) : 0;
-
   if (!$element['#leaves_only'] || empty($term->children)) {
     $e = array(
       '#type' => ($max_choices == 1) ? 'radio' : 'checkbox',
