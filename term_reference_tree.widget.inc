@@ -689,10 +689,10 @@ function _term_reference_tree_get_allowed_values($filter) {
 function _term_reference_tree_build_item($element, $term, $form_state, $value, $max_choices, $parent_tids, $parent, $depth) {
   $term_name = $term->name;
   if (!empty($element['#token_display']) && module_exists('token') && !empty($term->term_reference_tree_token)) {
-    $term_name = $term->term_reference_tree_token;
+    $term_name = check_plain($term->term_reference_tree_token);
   }
   elseif (!empty($term->term_reference_tree_label)) {
-    $term_name = $term->term_reference_tree_label;
+    $term_name = check_plain($term->term_reference_tree_label);
   }
 
   $container = array(
