@@ -154,6 +154,8 @@ function _term_reference_tree_taxonomy_get_tree($vid) {
     }
   }
 
+  drupal_alter('term_reference_get_children', $tree[$vid]);
+
   return $tree[$vid];
 }
 
