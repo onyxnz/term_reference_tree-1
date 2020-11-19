@@ -1,10 +1,10 @@
 (function($) {
 
-if (Drupal.ajax) {
-  Drupal.ajax.prototype.commands.term_reference_tree_append_children = function (ajax, response, status) {
+if (Backdrop.ajax) {
+  Backdrop.ajax.prototype.commands.term_reference_tree_append_children = function (ajax, response, status) {
     $(ajax.wrapper).siblings('.term-reference-tree-button').removeClass('term-reference-tree-collapsed');
     $newElement = $('<div></div>').html(response.data);
-    Drupal.attachBehaviors($newElement);
+    Backdrop.attachBehaviors($newElement);
     $newElement = $newElement.contents();
     $newElement.show();
     $(ajax.wrapper).replaceWith($newElement);
@@ -16,24 +16,24 @@ if (Drupal.ajax) {
 /**
  * Attaches the tree behavior to the term widget form.
  */
-Drupal.behaviors.termReferenceTree = {
+Backdrop.behaviors.termReferenceTree = {
   attach: function(context, settings) {
     // Adds custom loading class in expanding button.
     $('.term-reference-tree-widget-level-ajax-button.ajax-processed', context).once(function() {
       var $element = $(this).closest('ul.term-reference-tree-level li');
       var id = $(this).attr('id');
 
-      Drupal.ajax[id].options.beforeSend = function (xmlhttprequest, options) {
-        Drupal.ajax[id].ajaxing = true;
+      Backdrop.ajax[id].options.beforeSend = function (xmlhttprequest, options) {
+        Backdrop.ajax[id].ajaxing = true;
         $element.addClass('loading');
-        return Drupal.ajax[id].beforeSend(xmlhttprequest, options);
+        return Backdrop.ajax[id].beforeSend(xmlhttprequest, options);
       };
 
-      Drupal.ajax[id].options.complete = function (xmlhttprequest, status) {
-        Drupal.ajax[id].ajaxing = false;
+      Backdrop.ajax[id].options.complete = function (xmlhttprequest, status) {
+        Backdrop.ajax[id].ajaxing = false;
         $element.removeClass('loading');
         if (status == 'error' || status == 'parsererror') {
-          return Drupal.ajax[id].error(xmlhttprequest, ajax.url);
+          return Backdrop.ajax[id].error(xmlhttprequest, ajax.url);
         }
       };
     });
@@ -289,7 +289,7 @@ function removeNothingSelectedMessage(track_list_container) {
 function checkMaxChoices(item, checkbox) {
   var maxChoices = -1;
   try {
-    maxChoices = parseInt(Drupal.settings.term_reference_tree.trees[item.attr('id')]['max_choices']);
+    maxChoices = parseInt(Backdrop.settings.term_reference_tree.trees[item.attr('id')]['max_choices']);
   }
   catch (e){}
   var count = item.find(':checked').length;

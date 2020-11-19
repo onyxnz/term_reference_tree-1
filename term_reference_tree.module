@@ -1,5 +1,4 @@
 <?php
-
 module_load_include('inc', 'term_reference_tree', 'term_reference_tree.field');
 module_load_include('inc', 'term_reference_tree', 'term_reference_tree.widget');
 
@@ -39,6 +38,7 @@ function term_reference_tree_element_info() {
   return $types;
 }
 
+
 /**
  * Implements hook_theme().
  */
@@ -65,13 +65,14 @@ function term_reference_tree_theme() {
   );
 }
 
+
 /**
- * This function returns a taxonomy term hierarchy in a nested array.
+ * Return a taxonomy term hierarchy in a nested array.
  *
  * @param int $tid
  *   The ID of the root term.
- * @param int $vid
- *   The vocabulary ID to restrict the child search.
+ * @param string $vocabulary_name
+ *   The vocabulary name to restrict the child search.
  * @param array $allowed
  *   (Optional) An array of allowed tids.
  * @param array $expanded
@@ -84,14 +85,15 @@ function term_reference_tree_theme() {
  * @return array
  *   A nested array of the term's child objects.
  */
-function _term_reference_tree_get_term_hierarchy($tid, $vid, $allowed = array(), $expanded = array(), $use_ajax = FALSE, $max_depth = NULL) {
-  $tree = _term_reference_tree_taxonomy_get_tree($vid);
+function _term_reference_tree_get_term_hierarchy($tid, $vocabulary_name, $allowed = array(), $expanded = array(), $use_ajax = FALSE, $max_depth = NULL) {
+  $tree = _term_reference_tree_taxonomy_get_tree($vocabulary_name);
   if (!empty($allowed)) {
     $tree['terms'] = array_intersect_key($tree['terms'], $allowed);
   }
 
   return _term_reference_tree_get_term_hierarchy_recursive($tid, $tree, $expanded, $use_ajax, $max_depth);
 }
+
 
 /**
  * Recursive helper function for _term_reference_tree_get_term_hierarchy().
@@ -121,78 +123,82 @@ function _term_reference_tree_get_term_hierarchy_recursive($parent_tid, $tree, $
   return $terms;
 }
 
+
 /**
- * Gets all terms and their parent and children hierarchy for a given vid.
+ * Get all terms and their parent and children hierarchy for a given vocabulary_name.
  *
- * @param int $vid
- *   The taxonomy vocabulary ID.
+ * @param string $vocabulary_name
+ *   The taxonomy vocabulary name.
  *
  * @return array
  *   An array containing all terms, children and parent hierarchy.
  */
-function _term_reference_tree_taxonomy_get_tree($vid) {
-  $tree = &drupal_static(__FUNCTION__, array());
+function _term_reference_tree_taxonomy_get_tree($vocabulary_name) {
+  $tree = &backdrop_static(__FUNCTION__, array());
 
-  if (!isset($tree[$vid])) {
+  if (!isset($tree[$vocabulary_name])) {
     $query = db_select('taxonomy_term_data', 't');
     $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
-    $query->join('taxonomy_vocabulary', 'v', 't.vid = v.vid');
-    $query->addField('v', 'machine_name', 'vocabulary_machine_name');
+//     $query->join('taxonomy_vocabulary', 'v', 't.vocabulary_name = v.vocabulary_name');
+//     $query->addField('v', 'machine_name', 'vocabulary_machine_name');
     $result = $query->addTag('translatable')
       ->addTag('taxonomy_term_access')
       ->fields('t')
       ->fields('h', array('parent'))
-      ->condition('t.vid', $vid)
+      ->condition('t.vocabulary', $vocabulary_name)
       ->orderBy('t.weight')
       ->orderBy('t.name')
       ->execute();
 
     foreach ($result as $term) {
-      $tree[$vid]['children'][$term->parent][] = $term->tid;
-      $tree[$vid]['parents'][$term->tid][] = $term->parent;
-      $tree[$vid]['terms'][$term->tid] = $term;
+      $tree[$vocabulary_name]['children'][$term->parent][] = $term->tid;
+      $tree[$vocabulary_name]['parents'][$term->tid][] = $term->parent;
+      $tree[$vocabulary_name]['terms'][$term->tid] = $term;
     }
   }
 
-  drupal_alter('term_reference_get_children', $tree[$vid]);
+  backdrop_alter('term_reference_get_children', $tree[$vocabulary_name]);
 
-  return $tree[$vid];
+  return $tree[$vocabulary_name];
 }
 
+
 /**
- * Gets all parent tids for a given vid and children tids.
+ * Get all parent tids for a given vocabulary_name and children tids.
  *
- * @param int $vid
- *   The taxonomy vocabulary ID.
+ * @param string $vocabulary_name
+ *   The taxonomy vocabulary name.
  * @param array $children_tids
  *   An array of tids for which to retrieve the parents.
  *
  * @return array
  *   All parent tids of the given children tids.
  */
-function _term_reference_tree_taxonomy_get_parents_all($vid, $children_tids) {
-  $tree = _term_reference_tree_taxonomy_get_tree($vid);
-  return _term_reference_tree_taxonomy_get_parents_all_recursive($vid, $children_tids, $tree);
+function _term_reference_tree_taxonomy_term_load_parents_all($vocabulary_name, $children_tids) {
+  $tree = _term_reference_tree_taxonomy_get_tree($vocabulary_name);
+  return _term_reference_tree_taxonomy_term_load_parents_all_recursive($vocabulary_name, $children_tids, $tree);
 }
 
+
 /**
- * Helper function for _term_reference_tree_taxonomy_get_parents_all().
+ * Helper function for _term_reference_tree_taxonomy_term_load_parents_all().
  */
-function _term_reference_tree_taxonomy_get_parents_all_recursive($vid, $children_tids, $tree) {
+function _term_reference_tree_taxonomy_term_load_parents_all_recursive($vocabulary_name, $children_tids, $tree) {
   $parents = array();
   foreach ($children_tids as $child_tid) {
     if (isset($tree['parents'][$child_tid])) {
       foreach ($tree['parents'][$child_tid] as $parent_tid) {
         $parents[$parent_tid] = $parent_tid;
       }
-      $parents += _term_reference_tree_taxonomy_get_parents_all_recursive($vid, $tree['parents'][$child_tid], $tree);
+      $parents += _term_reference_tree_taxonomy_term_load_parents_all_recursive($vocabulary_name, $tree['parents'][$child_tid], $tree);
     }
-   }
+  }
   return $parents;
 }
 
+
 /**
- * Resolves the label to use in the widget for the given taxonomy terms.
+ * Resolve the label to use in the widget for the given taxonomy terms.
  *
  * @param array $terms
  *   The array of taxonomy terms.
@@ -219,6 +225,10 @@ function _term_reference_tree_taxonomy_resolve_labels($terms, $token_display) {
   }
 }
 
+
+/**
+ * Flatten the tree hierarchy.
+ */
 function _term_reference_tree_hierarchy_flatten($terms_hierarchy) {
   $terms = array();
   foreach ($terms_hierarchy as $term) {
@@ -231,8 +241,16 @@ function _term_reference_tree_hierarchy_flatten($terms_hierarchy) {
   return $terms;
 }
 
+
+/**
+ * Get the parent tid of a taxonomy terms.
+ */
 function _term_reference_tree_get_parent($tid) {
-  $q = db_query_range("SELECT h.parent FROM {taxonomy_term_hierarchy} h WHERE h.tid = :tid", 0, 1, array(':tid' => $tid));
+  $q = db_query_range("
+    SELECT h.parent
+    FROM {taxonomy_term_hierarchy} h
+    WHERE h.tid = :tid
+    ", 0, 1, array(':tid' => $tid));
 
   $t = 0;
   foreach ($q as $term) {
@@ -242,9 +260,9 @@ function _term_reference_tree_get_parent($tid) {
   return $t;
 }
 
+
 /**
- * Recursively go through the option tree and return a flat array of
- * options
+ * Recursively go through the option tree and return a flat array of options.
  */
 function _term_reference_tree_flatten($element, &$form_state) {
   $output = array();

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Implements hook_field_widget_info().
  */
@@ -27,6 +26,7 @@ function term_reference_tree_field_widget_info() {
     ),
   );
 }
+
 
 /**
  * Implements hook_field_widget_settings_form().
@@ -157,8 +157,9 @@ function term_reference_tree_field_widget_settings_form($field, $instance) {
   return $form;
 }
 
+
 /**
- * Themes the term tree display (as opposed to the select widget).
+ * Theme the term tree display (as opposed to the select widget).
  */
 function theme_term_tree_list($variables) {
   $element = &$variables['element'];
@@ -203,6 +204,7 @@ function theme_term_tree_list($variables) {
   $output .= '</div>';
   return $output;
 }
+
 
 /**
  * Helper function to output a single level of the term reference tree display.
@@ -251,8 +253,9 @@ function _term_reference_tree_output_list_level(&$element, &$tree) {
   }
 }
 
+
 /**
- * Makes sure that cardinality is unlimited if auto-select parents is enabled.
+ * Make sure that cardinality is unlimited if auto-select parents is enabled.
  */
 function _term_reference_tree_select_parents_validate($element, &$form_state) {
   if ($form_state['values']['instance']['widget']['settings']['select_parents'] == 1 && $form_state['values']['field']['cardinality'] != -1) {
@@ -262,8 +265,9 @@ function _term_reference_tree_select_parents_validate($element, &$form_state) {
   }
 }
 
+
 /**
- * Makes sure that cardinality is unlimited if cascading selection is enabled.
+ * Make sure that cardinality is unlimited if cascading selection is enabled.
  */
 function _term_reference_tree_cascading_selection_validate($element, &$form_state) {
   if ($form_state['values']['instance']['widget']['settings']['cascading_selection'] == 1) {
@@ -277,6 +281,7 @@ function _term_reference_tree_cascading_selection_validate($element, &$form_stat
     }
   }
 }
+
 
 /**
  * Process the checkbox_tree widget.
@@ -299,22 +304,22 @@ function term_reference_tree_process_checkbox_tree($element, $form_state) {
     $max_depth = !empty($element['#max_depth']) ? $element['#max_depth'] : NULL;
 
     // Build the terms hierarchy.
-    $default_parents = _term_reference_tree_taxonomy_get_parents_all($element['#vocabulary']->vid, $default);
+    $default_parents = _term_reference_tree_taxonomy_term_load_parents_all($element['#vocabulary']->machine_name, $default);
     $element['#expanded'] = $opened + $default_parents;
-    $element['#options_tree'] = _term_reference_tree_get_term_hierarchy($element['#parent_tid'], $element['#vocabulary']->vid, $allowed, $element['#expanded'], $element['#use_ajax'], $max_depth);
+    $element['#options_tree'] = _term_reference_tree_get_term_hierarchy($element['#parent_tid'], $element['#vocabulary']->machine_name, $allowed, $element['#expanded'], $element['#use_ajax'], $max_depth);
 
     // Flatten the hierarchy.
     $terms_flat = _term_reference_tree_hierarchy_flatten($element['#options_tree']);
 
     // Give other modules a chance to alter the terms.
-    drupal_alter('term_reference_tree_process_terms', $terms_flat, $element);
+    backdrop_alter('term_reference_tree_process_terms', $terms_flat, $element);
 
     // Resolve labels.
     _term_reference_tree_taxonomy_resolve_labels($terms_flat, $element['#token_display']);
 
     $max_choices = !empty($element['#max_choices']) ? $element['#max_choices'] : 1;
     if ($max_choices != '-1') {
-      drupal_add_js(array('term_reference_tree' => array('trees' => array($element['#id'] => array('max_choices' => $element['#max_choices'])))), 'setting');
+      backdrop_add_js(array('term_reference_tree' => array('trees' => array($element['#id'] => array('max_choices' => $element['#max_choices'])))), 'setting');
     }
 
     if ($max_choices == 1 && !$element['#required']) {
@@ -352,6 +357,7 @@ function term_reference_tree_process_checkbox_tree($element, $form_state) {
   return $element;
 }
 
+
 /**
  * Returns HTML for a checkbox_tree form element.
  *
@@ -363,7 +369,7 @@ function term_reference_tree_process_checkbox_tree($element, $form_state) {
  */
 function theme_checkbox_tree($variables) {
   $element = $variables['element'];
-  $element['#children'] = drupal_render_children($element);
+  $element['#children'] = backdrop_render_children($element);
 
   $attributes = array();
   if (isset($element['#id'])) {
@@ -394,16 +400,15 @@ function theme_checkbox_tree($variables) {
   if (!empty($element['#attributes']['class'])) {
     $attributes['class'] = array_merge($attributes['class'], $element['#attributes']['class']);
   }
-  return
-    '<div' . drupal_attributes($attributes) . '>'
+  return '<div' . backdrop_attributes($attributes) . '>'
     . (!empty($element['#children']) ? $element['#children'] : '')
     . '</div>';
 }
 
 
 /**
- * This function prints a list item with a checkbox and an unordered list
- * of all the elements inside it.
+ * Print a list item with a checkbox and an unordered list of all the elements
+ * inside it.
  */
 function theme_checkbox_tree_level($variables) {
   $element = $variables['element'];
@@ -415,8 +420,23 @@ function theme_checkbox_tree_level($variables) {
   $output = '<ul class="term-reference-tree-level "' . $sm . '>';
   $children = element_children($element);
   foreach ($children as $child) {
-    $output .= '<li>';
-    $output .= drupal_render($element[$child]);
+    $element_child = $element[$child];
+    $classes = array();
+    $classes[] = 'term-reference-tree-tid-' . $child;
+    $has_children = FALSE;
+    foreach ($element_child as $key => $value) {
+      if (strpos($key, '-children') !== FALSE) {
+        $classes[] = 'term-reference-tree-has-children';
+        $has_children = TRUE;
+        break;
+      }
+    }
+    if (!$has_children) {
+      $classes[] = 'term-reference-tree-no-children';
+    }
+    $classes = implode(' ', $classes);
+    $output .= "<li class=\"$classes\">";
+    $output .= backdrop_render($element[$child]);
     $output .= '</li>';
   }
 
@@ -425,10 +445,10 @@ function theme_checkbox_tree_level($variables) {
   return $output;
 }
 
+
 /**
- * This function prints a single item in the tree, followed by that item's
- * children
- * (which may be another checkbox_tree_level).
+ * Print a single item in the tree, followed by that item's children (which may
+ * be another checkbox_tree_level).
  */
 function theme_checkbox_tree_item($variables) {
   $element = $variables['element'];
@@ -437,7 +457,7 @@ function theme_checkbox_tree_item($variables) {
   $output = '';
   if ($element['#has_children']) {
     if ($element['#level_start_minimized']) {
-      $id = drupal_html_id('term-reference-tree-' . $children[0]);
+      $id = backdrop_html_id('term-reference-tree-' . $children[0]);
       $output .= '<div id="' . $id . '" data-tid="' . $children[0] . '" class="term-reference-tree-button term-reference-tree-collapsed"></div>';
     }
     else {
@@ -449,14 +469,15 @@ function theme_checkbox_tree_item($variables) {
   }
 
   foreach ($children as $child) {
-    $output .= drupal_render($element[$child]);
+    $output .= backdrop_render($element[$child]);
   }
 
   return $output;
 }
 
+
 /**
- * This function prints a label that cannot be selected.
+ * Print a label that cannot be selected.
  */
 function theme_checkbox_tree_label($variables) {
   $element = $variables['element'];
@@ -482,7 +503,7 @@ function theme_checkbox_tree_track_list($variables) {
     $nothingselected = t('[Nothing selected]');
     // Add the "Nothing selected" text. To style it,
     // replace it with whatever you want. Could do this with a file instead.
-    drupal_add_js(
+    backdrop_add_js(
       'var termReferenceTreeNothingSelectedText = "' . $nothingselected . '";',
       'inline'
     );
@@ -501,13 +522,14 @@ function theme_checkbox_tree_track_list($variables) {
   return $output;
 }
 
+
 /**
  * Implements hook_field_widget_form().
  */
 function term_reference_tree_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $settings = $instance['widget']['settings'];
-  $vocabulary = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
-  $path = drupal_get_path('module', 'term_reference_tree');
+  $vocabulary = taxonomy_vocabulary_load($field['settings']['allowed_values'][0]['vocabulary']);
+  $path = backdrop_get_path('module', 'term_reference_tree');
   $value_key = key($field['columns']);
 
   $default_value = array();
@@ -566,9 +588,9 @@ function term_reference_tree_field_widget_form(&$form, &$form_state, $field, $in
 
 
 /**
- * Validates the term reference tree widgets.
+ * Validate the term reference tree widgets.
  *
- * This function sets the value of the tree widgets into a form that Drupal
+ * This function sets the value of the tree widgets into a form that Backdrop
  * can understand, and also checks if the field is required and has been
  * left empty.
  *
@@ -621,8 +643,9 @@ function _term_reference_tree_widget_validate(&$element, &$form_state) {
   return $element;
 }
 
+
 /**
- * Returns an array of allowed values defined by the given view.
+ * Return an array of allowed values defined by the given view.
  *
  * @param $filter
  *   A view, in the format VIEWNAME:DISPLAYNAME
@@ -642,19 +665,19 @@ function _term_reference_tree_get_allowed_values($filter) {
       if ($view->access($displayname)) {
         // Save the page title first, since execute_display() will reset this
         // to the display title.
-        $title = drupal_get_title();
+        $title = backdrop_get_title();
         $view->execute_display($displayname);
-        $title = drupal_set_title($title, PASS_THROUGH);
+        $title = backdrop_set_title($title, PASS_THROUGH);
         foreach ($view->result as $item) {
           $allowed[$item->tid] = TRUE;
         }
       }
       else {
-        drupal_set_message(t('Cannot access view for term reference tree widget.'), 'warning');
+        backdrop_set_message(t('Cannot access view for term reference tree widget.'), 'warning');
       }
     }
     else {
-      drupal_set_message(t('Term reference tree: no view named !view_name', array('!view_name' => $viewname)), 'warning');
+      backdrop_set_message(t('Term reference tree: no view named !view_name', array('!view_name' => $viewname)), 'warning');
     }
   }
 
@@ -663,7 +686,7 @@ function _term_reference_tree_get_allowed_values($filter) {
 
 
 /**
- * Builds a single item in the term reference tree widget.
+ * Build a single item in the term reference tree widget.
  *
  * This function returns an element with a checkbox for a single taxonomy term.
  * If that term has children, it appends checkbox_tree_level element that
@@ -720,7 +743,7 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
 
     if ($e['#type'] == 'radio') {
       $parents_for_id = array_merge($element['#parents'], array($term->tid));
-      $e['#id'] = drupal_html_id('edit-' . implode('-', $parents_for_id));
+      $e['#id'] = backdrop_html_id('edit-' . implode('-', $parents_for_id));
       $e['#parents'] = $element['#parents'];
     }
     $context = array(
@@ -728,7 +751,7 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
       'term' => $term,
       'form_state' => $form_state,
     );
-    drupal_alter('term_reference_tree_element', $e, $context);
+    backdrop_alter('term_reference_tree_element', $e, $context);
   }
   else {
     $e = array(
@@ -751,8 +774,9 @@ function _term_reference_tree_build_item($element, $term, $form_state, $value, $
   return $container;
 }
 
+
 /**
- * Builds a level in the term reference tree widget.
+ * Build a level in the term reference tree widget.
  *
  * This function returns an element that has a number of checkbox_tree_item
  * elements as children.  It is meant to be called recursively when the widget
@@ -792,7 +816,7 @@ function _term_reference_tree_build_level($element, $term, $form_state, $value, 
     }
   }
   else {
-    $id = drupal_html_id('term-reference-tree-widget-level-ajax-' . $term->tid);
+    $id = backdrop_html_id('term-reference-tree-widget-level-ajax-' . $term->tid);
     $container['#type'] = 'container';
     $container['#attributes']['id'] = $id;
     $container['#attributes']['class'][] = 'term-reference-tree-widget-level-ajax';
@@ -812,15 +836,16 @@ function _term_reference_tree_build_level($element, $term, $form_state, $value, 
   return $container;
 }
 
+
 /**
  * Ajax callback to load children for a list.
  */
 function term_reference_tree_children_callback($form, $form_state) {
   $button = $form_state['triggering_element'];
-  $element = drupal_array_get_nested_value($form, array_slice($button['#array_parents'], 0, -1));
+  $element = backdrop_array_get_nested_value($form, array_slice($button['#array_parents'], 0, -1));
   $commands[] = array(
     'command' => 'term_reference_tree_append_children',
-    'data' => drupal_render($element),
+    'data' => backdrop_render($element),
   );
   return array('#type' => 'ajax', '#commands' => $commands);
 }
