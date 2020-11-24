@@ -426,13 +426,13 @@ function theme_checkbox_tree_level($variables) {
     $has_children = FALSE;
     foreach ($element_child as $key => $value) {
       if (strpos($key, '-children') !== FALSE) {
-        $classes[] = 'term-reference-tree-has-children';
+        $classes[] = 'has-children';
         $has_children = TRUE;
         break;
       }
     }
     if (!$has_children) {
-      $classes[] = 'term-reference-tree-no-children';
+      $classes[] = 'no-children';
     }
     $classes = implode(' ', $classes);
     $output .= "<li class=\"$classes\">";
