@@ -215,22 +215,21 @@ function _term_reference_tree_output_list_level(&$element, &$tree) {
     $settings = $element['#display']['settings'];
     $tokens_selected = $settings['token_display_selected'];
     $tokens_unselected = ($settings['token_display_unselected'] != '') ? $settings['token_display_unselected'] : $tokens_selected;
-
     $taxonomy_term_info = entity_get_info('taxonomy_term');
     foreach ($tree['children'] as $itemno => &$item) {
-      $term = $taxonomy_term_info['load hook']($item['tid']);
+      $term = $taxonomy_term_info['load hook']($item['tid']);      
       // Do not output terms that do not exist.
       if ($term) {
-        $uri = $taxonomy_term_info['uri callback']($term);
+        $uri = (Array)$taxonomy_term_info['load hook']($term->tid);//should be $term->tid?
         $uri['options']['html'] = TRUE;
         $class = $item['selected'] ? 'selected' : 'unselected';
-        $output_fragment[$term->weight][$itemno] = '<li class="' . $class . '">';
+        $output_fragment[$term->weight][$itemno] = '<li class="' . $class . '">';        
         if ($tokens_selected != '' && module_exists('token')) {
           $replace = $item['selected'] ? $tokens_selected : $tokens_unselected;
           $output_fragment[$term->weight][$itemno] .= token_replace($replace, array('term' => $term), array('clear' => TRUE));
         }
         else {
-          $output_fragment[$term->weight][$itemno] .= l(filter_xss(entity_label('taxonomy_term', $term)), $uri['path'], $uri['options']);
+          $output_fragment[$term->weight][$itemno] .= l(filter_xss(entity_label('taxonomy_term', $term)), $uri['path']['source'], $uri['options']);
         }
         if (isset($item['children'])) {
           $output_fragment[$term->weight][$itemno] .= _term_reference_tree_output_list_level($element, $item);
